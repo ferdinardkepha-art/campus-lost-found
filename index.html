@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#f4f6f1">
+    <title>Campus Lost & Found</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #182522;
+            --muted: #697570;
+            --paper: #f4f6f1;
+            --white: #fff;
+            --line: #dfe5de;
+            --green: #176b54;
+            --green-dark: #10513f;
+            --mint: #dcefe6;
+            --coral: #ed765d;
+            --yellow: #f3c95b;
+            --shadow: 0 18px 45px rgba(24, 37, 34, .09);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: "DM Sans", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        button, input, select, textarea { font: inherit; }
+        button, a { -webkit-tap-highlight-color: transparent; }
+        a { color: inherit; }
+
+        .topbar {
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 0 max(5vw, calc((100vw - 1200px) / 2));
+            border-bottom: 1px solid var(--line);
+            background: rgba(255, 255, 255, .74);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+            color: var(--ink);
+            text-decoration: none;
+            font: 700 17px "Space Grotesk", sans-serif;
+        }
+
+        .brand-mark {
+            width: 35px;
+            height: 35px;
+            display: grid;
+            place-items: center;
+            border-radius: 11px;
+            background: var(--green);
+            color: white;
+            font-size: 19px;
+        }
+
+        .topbar nav { display: flex; align-items: center; gap: 29px; }
+        .topbar nav a { color: #59645f; font-size: 13px; text-decoration: none; }
+        .topbar nav a:hover { color: var(--green); }
+
+        .button {
+            min-height: 44px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 0 17px;
+            border: 0;
+            border-radius: 7px;
+            background: var(--green);
+            color: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background .18s ease, transform .18s ease;
+        }
+
+        .button:hover { background: var(--green-dark); transform: translateY(-1px); }
+        .button .plus { font-size: 19px; font-weight: 400; line-height: 1; }
+
+        .page { width: min(1120px, calc(100% - 48px)); margin: 0 auto; }
+
+        .intro {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            gap: 28px;
+            min-height: 254px;
+            margin-top: 35px;
+            padding: 38px 48px;
+            overflow: hidden;
+            border-radius: 10px;
+            background: var(--green);
+            color: white;
+            isolation: isolate;
+            animation: arrive .55s ease both;
+        }
+
+        .intro::after {
+            position: absolute;
+            z-index: -1;
+            right: 8%;
+            bottom: -140px;
+            width: 340px;
+            height: 340px;
+            border: 1px solid rgba(255,255,255,.19);
+            border-radius: 50%;
+            box-shadow: 0 0 0 38px rgba(255,255,255,.035), 0 0 0 78px rgba(255,255,255,.035);
+            content: "";
+        }
+
+        .eyebrow {
+            margin: 0 0 13px;
+            color: #b7e2ce;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 1.2px;
+            text-transform: uppercase;
+        }
+
+        h1, h2, h3, p { margin-top: 0; }
+        h1, h2, h3 { font-family: "Space Grotesk", sans-serif; }
+
+        .intro h1 { max-width: 520px; margin-bottom: 10px; font-size: clamp(32px, 4vw, 43px); line-height: 1.08; }
+        .intro-copy { max-width: 490px; margin: 0; color: #d8e9e0; font-size: 14px; line-height: 1.65; }
+        .intro .button { min-width: 156px; min-height: 49px; background: var(--yellow); color: var(--ink); }
+        .intro .button:hover { background: #ffda70; }
+
+        .board-head {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-between;
+            gap: 24px;
+            margin: 41px 0 19px;
+        }
+
+        .board-head h2 { margin-bottom: 5px; font-size: 23px; }
+        .board-head p { margin: 0; color: var(--muted); font-size: 13px; }
+        .board-count { color: var(--muted); font-size: 12px; white-space: nowrap; }
+
+        .filters {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--line);
+        }
+
+        .tabs { display: flex; align-items: center; gap: 5px; }
+
+        .tab {
+            min-height: 37px;
+            padding: 0 14px;
+            border: 1px solid transparent;
+            border-radius: 6px;
+            background: transparent;
+            color: var(--muted);
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .tab[aria-selected="true"] { border-color: var(--line); background: white; color: var(--ink); }
+
+        .search {
+            width: min(270px, 45vw);
+            height: 39px;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            padding: 0 11px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: white;
+            color: var(--muted);
+        }
+
+        .search svg { flex: none; }
+        .search input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 12px; }
+        .search input::placeholder { color: #89928e; }
+
+        .item-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 13px; margin: 17px 0 57px; }
+
+        .item-card {
+            min-height: 177px;
+            padding: 20px 21px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: white;
+            animation: arrive .35s ease both;
+        }
+
+        .card-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+        .type { display: inline-flex; align-items: center; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        .type::before { width: 8px; height: 8px; border-radius: 50%; background: var(--coral); content: ""; }
+        .type.found::before { background: #4da47d; }
+        .category { color: #77817d; font-size: 11px; }
+        .item-card h3 { margin: 0 0 7px; font-size: 18px; }
+        .description { margin: 0 0 15px; color: #59645f; font-size: 12px; line-height: 1.55; }
+        .card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 17px; color: #77817d; font-size: 11px; }
+        .card-meta span { display: inline-flex; align-items: center; gap: 5px; }
+        .card-contact { display: block; margin-top: 13px; color: var(--green); font-size: 12px; font-weight: 700; text-decoration: none; overflow-wrap: anywhere; }
+        .card-contact:hover { text-decoration: underline; }
+
+        .empty-state { grid-column: 1 / -1; padding: 54px 20px; text-align: center; color: var(--muted); }
+        .empty-state strong { display: block; margin-bottom: 6px; color: var(--ink); font: 600 19px "Space Grotesk", sans-serif; }
+
+        .how { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; padding: 28px 0 46px; border-top: 1px solid var(--line); }
+        .how h2 { margin-bottom: 9px; font-size: 20px; }
+        .how p { max-width: 500px; margin-bottom: 0; color: var(--muted); font-size: 12px; line-height: 1.7; }
+        footer { padding: 19px 24px; border-top: 1px solid var(--line); color: var(--muted); text-align: center; font-size: 11px; }
+
+        dialog {
+            width: min(520px, calc(100% - 28px));
+            max-height: min(92vh, 760px);
+            padding: 0;
+            overflow: auto;
+            border: 0;
+            border-radius: 10px;
+            background: white;
+            color: var(--ink);
+            box-shadow: var(--shadow);
+        }
+
+        dialog::backdrop { background: rgba(14, 29, 24, .58); backdrop-filter: blur(3px); }
+        .dialog-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; padding: 23px 25px 16px; border-bottom: 1px solid var(--line); }
+        .dialog-head h2 { margin: 0 0 4px; font-size: 21px; }
+        .dialog-head p { margin: 0; color: var(--muted); font-size: 12px; }
+        .close-button { width: 34px; height: 34px; display: grid; place-items: center; border: 0; border-radius: 6px; background: #f0f3ef; color: var(--ink); cursor: pointer; font-size: 19px; }
+        form { padding: 20px 25px 24px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        .field { display: grid; gap: 6px; margin-bottom: 14px; }
+        .field.full { grid-column: 1 / -1; }
+        .field label { font-size: 12px; font-weight: 700; }
+        .field input, .field select, .field textarea { width: 100%; min-height: 41px; padding: 9px 11px; border: 1px solid #d7dfd8; border-radius: 5px; outline: 0; background: white; color: var(--ink); font-size: 12px; }
+        .field textarea { min-height: 80px; resize: vertical; }
+        .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(23,107,84,.1); }
+        .form-note { margin: 0 0 17px; color: var(--muted); font-size: 11px; line-height: 1.5; }
+        .form-actions { display: flex; justify-content: flex-end; gap: 9px; }
+        .button.secondary { border: 1px solid var(--line); background: white; color: var(--ink); }
+        .button.secondary:hover { background: #f3f5f2; }
+
+        @keyframes arrive { from { opacity: 0; transform: translateY(9px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 700px) {
+            .topbar { height: 65px; padding: 0 20px; }
+            .topbar nav { gap: 16px; }
+            .topbar nav a:first-child { display: none; }
+            .topbar nav a { font-size: 12px; }
+            .topbar .button { min-height: 38px; padding: 0 11px; font-size: 12px; }
+            .page { width: calc(100% - 36px); }
+            .intro { min-height: 0; grid-template-columns: 1fr; gap: 22px; margin-top: 22px; padding: 30px 26px; }
+            .intro h1 { font-size: 34px; }
+            .intro .button { justify-self: start; }
+            .board-head { margin-top: 32px; }
+            .item-list { grid-template-columns: 1fr; }
+            .how { grid-template-columns: 1fr; gap: 21px; }
+        }
+
+        @media (max-width: 460px) {
+            .topbar { gap: 8px; padding: 0 14px; }
+            .brand { gap: 7px; font-size: 14px; }
+            .brand-mark { width: 31px; height: 31px; }
+            .topbar nav { gap: 10px; }
+            .topbar nav a:nth-child(2) { display: none; }
+            .topbar .button { min-height: 36px; padding: 0 9px; font-size: 11px; }
+            .page { width: calc(100% - 28px); }
+            .board-head { align-items: flex-start; }
+            .board-count { padding-top: 7px; }
+            .filters { align-items: stretch; flex-direction: column; }
+            .tabs { justify-content: space-between; }
+            .tab { flex: 1; padding: 0 8px; }
+            .search { width: 100%; }
+            .form-grid { grid-template-columns: 1fr; gap: 0; }
+            .field.full { grid-column: auto; }
+            form { padding: 17px 19px 20px; }
+            .dialog-head { padding: 20px 19px 15px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <a class="brand" href="#top" aria-label="Campus Lost and Found home">
+            <span class="brand-mark" aria-hidden="true">↗</span>
+            <span>Campus Lost &amp; Found</span>
+        </a>
+        <nav aria-label="Main navigation">
+            <a href="#board">Browse items</a>
+            <a href="#how-it-works">About</a>
+            <button class="button" type="button" data-open-form><span class="plus" aria-hidden="true">+</span> Post an item</button>
+        </nav>
+    </header>
+
+    <main id="top" class="page">
+        <section class="intro" aria-labelledby="intro-title">
+            <div>
+                <p class="eyebrow">A little help goes a long way</p>
+                <h1 id="intro-title">Lost something? Let's get it back.</h1>
+                <p class="intro-copy">A shared noticeboard for things misplaced and things found around campus. Post a notice or see if yours is already here.</p>
+            </div>
+            <button class="button" type="button" data-open-form><span class="plus" aria-hidden="true">+</span> Post a notice</button>
+        </section>
+
+        <section id="board" aria-labelledby="board-title">
+            <div class="board-head">
+                <div>
+                    <h2 id="board-title">The noticeboard</h2>
+                    <p>Recent reports from around campus</p>
+                </div>
+                <span id="result-count" class="board-count" aria-live="polite"></span>
+            </div>
+            <div class="filters">
+                <div class="tabs" role="tablist" aria-label="Filter notices">
+                    <button class="tab" type="button" role="tab" aria-selected="true" data-filter="all">All notices</button>
+                    <button class="tab" type="button" role="tab" aria-selected="false" data-filter="lost">Lost</button>
+                    <button class="tab" type="button" role="tab" aria-selected="false" data-filter="found">Found</button>
+                </div>
+                <label class="search">
+                    <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m16 16 4 4"></path></svg>
+                    <input id="search-input" type="search" placeholder="Search items or places" aria-label="Search items or places">
+                </label>
+            </div>
+            <div id="item-list" class="item-list" aria-live="polite"></div>
+        </section>
+
+        <section id="how-it-works" class="how" aria-labelledby="about-title">
+            <div>
+                <h2 id="about-title">A campus works better when we look out for each other.</h2>
+            </div>
+            <p>Post what you lost or found with a few details and where it happened. If a notice looks like your item, use the contact link to arrange a safe handoff. Meet in a public campus spot, and keep identifying details private until you connect.</p>
+        </section>
+    </main>
+
+    <footer>Campus Lost &amp; Found <span aria-hidden="true">·</span> Look out for one another</footer>
+
+    <dialog id="post-dialog" aria-labelledby="dialog-title">
+        <div class="dialog-head">
+            <div>
+                <h2 id="dialog-title">Post a notice</h2>
+                <p>Share the useful details so the right person can find it.</p>
+            </div>
+            <button class="close-button" type="button" aria-label="Close form" data-close-form>×</button>
+        </div>
+        <form id="notice-form">
+            <div class="form-grid">
+                <div class="field">
+                    <label for="notice-type">Notice type</label>
+                    <select id="notice-type" name="type" required>
+                        <option value="lost">I lost something</option>
+                        <option value="found">I found something</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label for="notice-category">Category</label>
+                    <select id="notice-category" name="category" required>
+                        <option>Electronics</option><option>Keys</option><option>Clothing</option><option>Wallets &amp; cards</option><option>Books &amp; stationery</option><option>Bags</option><option>Other</option>
+                    </select>
+                </div>
+                <div class="field full">
+                    <label for="notice-title">Item name</label>
+                    <input id="notice-title" name="title" maxlength="70" placeholder="e.g. Blue water bottle" required>
+                </div>
+                <div class="field">
+                    <label for="notice-location">Where?</label>
+                    <input id="notice-location" name="location" maxlength="70" placeholder="e.g. Library, second floor" required>
+                </div>
+                <div class="field">
+                    <label for="notice-date">When?</label>
+                    <input id="notice-date" name="date" type="date" required>
+                </div>
+                <div class="field full">
+                    <label for="notice-description">Description</label>
+                    <textarea id="notice-description" name="description" maxlength="240" placeholder="Color, brand, or other helpful details" required></textarea>
+                </div>
+                <div class="field full">
+                    <label for="notice-contact">Contact email</label>
+                    <input id="notice-contact" name="contact" type="email" maxlength="120" placeholder="you@school.edu" required>
+                </div>
+            </div>
+            <p class="form-note">Your notice is saved in this browser only. Avoid sharing passwords, student IDs, or other sensitive details.</p>
+            <div class="form-actions">
+                <button class="button secondary" type="button" data-close-form>Cancel</button>
+                <button class="button" type="submit">Publish notice</button>
+            </div>
+        </form>
+    </dialog>
+
+    <script>
+        const storageKey = "campus-lost-found-notices";
+        const starterNotices = [
+            { id: "sample-1", type: "lost", category: "Electronics", title: "Black wireless earbuds", location: "Science building, lecture hall 204", date: "2026-10-05", description: "Small black case with a silver mark on the lid. Last seen after the 2 pm lecture.", contact: "maya.student@example.edu" },
+            { id: "sample-2", type: "found", category: "Keys", title: "Set of keys on a green tag", location: "Outside the student union", date: "2026-10-04", description: "Found near the main entrance and turned in to the campus welcome desk.", contact: "welcome@example.edu" },
+            { id: "sample-3", type: "lost", category: "Books & stationery", title: "Calculus notebook", location: "Library, quiet study area", date: "2026-10-03", description: "Blue spiral notebook with a name written inside the front cover.", contact: "alex.student@example.edu" },
+            { id: "sample-4", type: "found", category: "Clothing", title: "Olive green jacket", location: "Gymnasium changing area", date: "2026-10-02", description: "Lightweight jacket left on the bench. Picked up by the front desk.", contact: "recreation@example.edu" }
+        ];
+
+        const itemList = document.querySelector("#item-list");
+        const countLabel = document.querySelector("#result-count");
+        const searchInput = document.querySelector("#search-input");
+        const postDialog = document.querySelector("#post-dialog");
+        const noticeForm = document.querySelector("#notice-form");
+        let activeFilter = "all";
+
+        function getNotices() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(storageKey));
+                return Array.isArray(saved) ? saved : starterNotices;
+            } catch {
+                return starterNotices;
+            }
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(`${dateString}T12:00:00`);
+            return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", year: "numeric" }).format(date);
+        }
+
+        function addMeta(container, symbol, text) {
+            const span = document.createElement("span");
+            span.append(document.createTextNode(`${symbol} ${text}`));
+            container.append(span);
+        }
+
+        function makeCard(notice) {
+            const card = document.createElement("article");
+            card.className = "item-card";
+
+            const top = document.createElement("div");
+            top.className = "card-top";
+            const type = document.createElement("span");
+            type.className = `type ${notice.type}`;
+            type.textContent = notice.type;
+            const category = document.createElement("span");
+            category.className = "category";
+            category.textContent = notice.category;
+            top.append(type, category);
+
+            const title = document.createElement("h3");
+            title.textContent = notice.title;
+            const description = document.createElement("p");
+            description.className = "description";
+            description.textContent = notice.description;
+            const meta = document.createElement("div");
+            meta.className = "card-meta";
+            addMeta(meta, "⌖", notice.location);
+            addMeta(meta, "·", formatDate(notice.date));
+
+            const contact = document.createElement("a");
+            contact.className = "card-contact";
+            contact.href = `mailto:${encodeURIComponent(notice.contact)}`;
+            contact.textContent = `Contact ${notice.contact}`;
+
+            card.append(top, title, description, meta, contact);
+            return card;
+        }
+
+        function renderNotices() {
+            const query = searchInput.value.trim().toLocaleLowerCase();
+            const notices = getNotices().filter((notice) => {
+                const matchesType = activeFilter === "all" || notice.type === activeFilter;
+                const searchable = `${notice.title} ${notice.category} ${notice.location} ${notice.description}`.toLocaleLowerCase();
+                return matchesType && searchable.includes(query);
+            });
+
+            itemList.replaceChildren();
+            countLabel.textContent = `${notices.length} ${notices.length === 1 ? "notice" : "notices"}`;
+
+            if (notices.length === 0) {
+                const empty = document.createElement("div");
+                empty.className = "empty-state";
+                const title = document.createElement("strong");
+                title.textContent = "No notices found";
+                const message = document.createElement("span");
+                message.textContent = "Try another search, or post a notice to the board.";
+                empty.append(title, message);
+                itemList.append(empty);
+                return;
+            }
+
+            notices.forEach((notice) => itemList.append(makeCard(notice)));
+        }
+
+        document.querySelectorAll("[data-open-form]").forEach((button) => button.addEventListener("click", () => postDialog.showModal()));
+        document.querySelectorAll("[data-close-form]").forEach((button) => button.addEventListener("click", () => postDialog.close()));
+        document.querySelectorAll("[data-filter]").forEach((button) => {
+            button.addEventListener("click", () => {
+                activeFilter = button.dataset.filter;
+                document.querySelectorAll("[data-filter]").forEach((tab) => tab.setAttribute("aria-selected", String(tab === button)));
+                renderNotices();
+            });
+        });
+        searchInput.addEventListener("input", renderNotices);
+
+        noticeForm.addEventListener("submit", (event) => {
+            event.preventDefault();
+            if (!noticeForm.reportValidity()) return;
+
+            const formData = new FormData(noticeForm);
+            const notice = Object.fromEntries(formData.entries());
+            notice.id = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
+            try {
+                const saved = JSON.parse(localStorage.getItem(storageKey));
+                const notices = Array.isArray(saved) ? saved : starterNotices;
+                localStorage.setItem(storageKey, JSON.stringify([notice, ...notices]));
+            } catch {
+                localStorage.setItem(storageKey, JSON.stringify([notice, ...starterNotices]));
+            }
+
+            noticeForm.reset();
+            postDialog.close();
+            activeFilter = "all";
+            document.querySelectorAll("[data-filter]").forEach((tab) => tab.setAttribute("aria-selected", String(tab.dataset.filter === "all")));
+            searchInput.value = "";
+            renderNotices();
+        });
+
+        renderNotices();
+    </script>
+</body>
+</html>
